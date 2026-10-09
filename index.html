@@ -6,6 +6,16 @@
 <meta name="theme-color" content="#0f0f0f">
 <title>Mindflux</title>
 <meta name="description" content="Mindflux — designing the next layer of mind–tech fusion.">
+<script>
+/* Arm the first-load entrance before the page can paint. A failed script releases it. */
+if ('animate' in Element.prototype && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.documentElement.classList.add('entrance-pending');
+  window.mindfluxEntranceFallback = setTimeout(function () {
+    document.documentElement.classList.remove('entrance-pending');
+    if (window.mindfluxEntranceCleanup) window.mindfluxEntranceCleanup();
+  }, 4000);
+}
+</script>
 <style>
 /* ───────────────────────── Fonts (embedded, latin subset) ───────────────────────── */
 @font-face{font-family:"Geist";font-weight:400;font-style:normal;font-display:block;src:url(assets/geist-400.woff2) format("woff2")}
@@ -121,6 +131,8 @@ img{display:block}
 .hero{position:absolute;left:0;right:0;top:calc(var(--ex) * .30);height:calc(var(--u)*512);z-index:2;text-align:center}
 .hero h1{position:absolute;left:0;right:0;top:calc(var(--u)*136);margin:0;
   font:600 calc(var(--u)*64.4)/1.2 var(--sans);letter-spacing:-.03em;color:var(--ink)}
+.heading-line{display:block;overflow:hidden}
+.heading-line-inner{display:block}
 .hero p{position:absolute;left:0;right:0;top:calc(var(--u)*314.5);margin:0;
   font:400 max(calc(var(--u)*17.09), 12px)/max(calc(var(--u)*21.8), 15.3px) var(--mono);color:var(--sub)}
 .ctas{position:absolute;left:50%;top:calc(var(--u)*404.5);transform:translateX(calc(-50% + var(--u)*1.05));
@@ -281,6 +293,12 @@ html.menu-lock{overflow:hidden}
   .card:hover img{transform:scale(1.03)}
 }
 @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+/* The stage remains still; only the opening foreground is held before its one entrance. */
+.entrance-pending .logo,.entrance-pending .nav,.entrance-pending .btn-call,
+.entrance-pending .menu-toggle,.entrance-pending .hero p,.entrance-pending .ctas .btn,
+.entrance-pending .side,.entrance-pending .meta{opacity:0}
+.entrance-pending .heading-line-inner{transform:translate3d(0,105%,0)}
+.entrance-pending .card{clip-path:inset(0 0 100% 0 round 16px)}
 </style>
 </head>
 <body>
@@ -309,7 +327,7 @@ html.menu-lock{overflow:hidden}
   </header>
 
   <main class="hero" id="vision">
-    <h1>Designing The Next Layer<br> Of Mind–Tech Fusion</h1>
+    <h1><span class="heading-line"><span class="heading-line-inner">Designing The Next Layer</span></span><span class="heading-line"><span class="heading-line-inner">Of Mind–Tech Fusion</span></span></h1>
     <p>We’re pioneering interfaces that blend cognition and computation —<br> designing seamless layers between minds and machines.</p>
     <div class="ctas">
       <a class="btn btn--primary" href="#vision">Explore Our Vision</a>
@@ -358,6 +376,91 @@ html.menu-lock{overflow:hidden}
   });
   (mobile.addEventListener?mobile.addEventListener.bind(mobile,'change'):mobile.addListener.bind(mobile))(function(m){ if(!m.matches) setOpen(false,false); });
 })();
+</script>
+<script>
+/* One coordinated first-load timeline. All animation effects are removed at completion. */
+(function () {
+  var root = document.documentElement;
+  if (!root.classList.contains('entrance-pending')) return;
+
+  var active = [], complete = false;
+  var ease = 'cubic-bezier(.22,1,.36,1)';
+  var mobile = matchMedia('(max-width: 619.98px)').matches;
+  var rise = mobile ? 6 : 10;
+
+  function finish() {
+    if (complete) return;
+    complete = true;
+    clearTimeout(window.mindfluxEntranceFallback);
+    root.classList.remove('entrance-pending');
+    active.forEach(function (animation) { animation.cancel(); });
+    window.mindfluxEntranceCleanup = null;
+  }
+  window.mindfluxEntranceCleanup = finish;
+
+  function inOpeningViewport(element) {
+    if (!element || getComputedStyle(element).visibility === 'hidden') return false;
+    var box = element.getBoundingClientRect();
+    return box.height > 0 && box.top < innerHeight && box.bottom > 0;
+  }
+  function cue(selector, frames, at, duration) {
+    var element = typeof selector === 'string' ? document.querySelector(selector) : selector;
+    if (!inOpeningViewport(element)) return;
+    active.push(element.animate(frames, {
+      delay: at, duration: duration, easing: ease, fill: 'both'
+    }));
+  }
+  function soft(selector, at, duration, distance) {
+    cue(selector, [
+      {opacity: 0, transform: 'translate3d(0,' + distance + 'px,0)'},
+      {opacity: 1, transform: 'none'}
+    ], at, duration);
+  }
+  function opacity(selector, at, duration) {
+    cue(selector, [{opacity: 0}, {opacity: 1}], at, duration);
+  }
+
+  function start() {
+    if (complete || !root.classList.contains('entrance-pending')) return;
+    try {
+      /* Establish the identity, then let the heading take the visual lead. */
+      opacity('.logo', 50, 430);
+      if (mobile) opacity('.menu-toggle', 130, 390);
+      else {
+        opacity('.nav', 120, 430);
+        opacity('.btn-call', 210, 430);
+      }
+      opacity('.side', 250, 450);
+
+      var lines = document.querySelectorAll('.heading-line-inner');
+      cue(lines[0], [{transform: 'translate3d(0,105%,0)'}, {transform: 'none'}], 210, 760);
+      cue(lines[1], [{transform: 'translate3d(0,105%,0)'}, {transform: 'none'}], 330, 790);
+
+      soft('.hero p', 610, 540, rise);
+      soft('.btn--primary', 810, 510, rise);
+      soft('.btn--ghost', 910, 510, rise);
+
+      /* The three foreground photographs complete the composition as one gallery. */
+      document.querySelectorAll('.cards .card').forEach(function (card, index) {
+        cue(card, [
+          {clipPath: 'inset(0 0 100% 0 round 16px)'},
+          {clipPath: 'inset(0 0 0 0 round 16px)'}
+        ], 850 + index * 110, 820);
+      });
+      opacity('.meta', 1270, 400);
+
+      root.classList.remove('entrance-pending');
+      Promise.all(active.map(function (animation) {
+        return animation.finished.catch(function () {});
+      })).then(finish);
+    } catch (error) {
+      finish();
+    }
+  }
+
+  if (document.readyState === 'complete') requestAnimationFrame(start);
+  else addEventListener('load', function () { requestAnimationFrame(start); }, {once: true});
+}());
 </script>
 </body>
 </html>
