@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f0f">
+<title>Mindflux</title>
+<meta name="description" content="Mindflux — designing the next layer of mind–tech fusion.">
+<style>
+/* ───────────────────────── Fonts (embedded, latin subset) ───────────────────────── */
+@font-face{font-family:"Geist";font-weight:400;font-style:normal;font-display:block;src:url(assets/geist-400.woff2) format("woff2")}
+@font-face{font-family:"Geist";font-weight:500;font-style:normal;font-display:block;src:url(assets/geist-500.woff2) format("woff2")}
+@font-face{font-family:"Geist";font-weight:600;font-style:normal;font-display:block;src:url(assets/geist-600.woff2) format("woff2")}
+@font-face{font-family:"Geist Mono";font-weight:400;font-style:normal;font-display:block;src:url(assets/geist-mono-400.woff2) format("woff2")}
+@font-face{font-family:"Geist Mono";font-weight:500;font-style:normal;font-display:block;src:url(assets/geist-mono-500.woff2) format("woff2")}
+
+/* ───────────────────────── Design tokens ─────────────────────────
+   Reference artboard: 1440 × 1024 design px (the supplied 2048 × 1456 comp is this
+   artboard rendered at 1.4222×). Every measurement below is in design px and is
+   multiplied by --u, the size of one design pixel on the current screen. */
+:root{
+  color-scheme:dark;
+  --bg:#0f0f0f;
+  --ink:#ededed;            /* headline, logo, CTA text */
+  --ink-2:#d3d3d3;          /* side label */
+  --nav:#a6a6a6;            /* nav links */
+  --sub:#afafaf;            /* hero paragraph */
+  --meta:#a4a4a4;           /* footer meta */
+  --accent:#d2582b;         /* primary CTA */
+  --accent-hi:#e0653a;
+  --on-accent:#0f0f0f;
+  --cta-ink:#e9e9e9;
+  --cap:#f2f2f2;
+  --guide:rgba(255,255,255,.17);
+  --dash:rgba(255,255,255,.47);
+  --rim-a:rgba(255,255,255,.62);
+  --rim-b:rgba(255,255,255,.12);
+  --rim-c:rgba(255,255,255,.40);
+  --card-veil:rgba(130,130,130,.08);
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --grain:url(assets/grain.webp);
+
+  /* one design pixel. Fit the 1440×1024 artboard by its limiting side … */
+  --vh:1vh;
+  --u:min(calc(100vw / 1440), calc(var(--vh) * 100 / 1024));
+  /* … and hand any extra height to the layout instead of leaving bands. */
+  --ex:max(0px, calc(var(--vh) * 100 - var(--u) * 1024));
+}
+@supports (height:1dvh){ :root{ --vh:1dvh; } }
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  background:var(--bg) var(--grain) 0 0 / calc(var(--u) * 256) repeat;
+  color:var(--ink);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:geometricPrecision;
+}
+a{color:inherit;text-decoration:none}
+img{display:block}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:focus-visible{outline:1px solid var(--accent);outline-offset:3px}
+
+/* dashed strokes drawn with gradients: exact 2px dash / 2px gap, like the comp */
+.dash-box{
+  --d:var(--dash); --t:max(1px, var(--u));
+  background:
+    repeating-linear-gradient(90deg,var(--d) 0 calc(var(--u)*2),transparent 0 calc(var(--u)*4)) left top / 100% var(--t) no-repeat,
+    repeating-linear-gradient(90deg,var(--d) 0 calc(var(--u)*2),transparent 0 calc(var(--u)*4)) left bottom / 100% var(--t) no-repeat,
+    repeating-linear-gradient(180deg,var(--d) 0 calc(var(--u)*2),transparent 0 calc(var(--u)*4)) left top / var(--t) 100% no-repeat,
+    repeating-linear-gradient(180deg,var(--d) 0 calc(var(--u)*2),transparent 0 calc(var(--u)*4)) right top / var(--t) 100% no-repeat;
+}
+
+/* ═════════════════════════ DESKTOP / LANDSCAPE (artboard mode) ═════════════════════════ */
+.frame{position:relative;width:100%;height:calc(var(--vh) * 100);overflow:hidden;isolation:isolate}
+
+/* guide lines + registration crosses */
+.guide{position:absolute;pointer-events:none;z-index:0}
+.guide--v{top:0;bottom:0;width:max(1px,var(--u));
+  background:repeating-linear-gradient(180deg,var(--guide) 0 calc(var(--u)*2),transparent 0 calc(var(--u)*4))}
+.guide--h{left:0;right:0;height:max(1px,var(--u));
+  background:repeating-linear-gradient(90deg,var(--guide) 0 calc(var(--u)*2),transparent 0 calc(var(--u)*4))}
+.guide--l{left:calc(var(--u)*64.35)}
+.guide--r{right:calc(var(--u)*63.5)}
+.guide--t{top:calc(var(--u)*63)}
+.guide--b{bottom:calc(var(--u)*65)}
+.cross{position:absolute;width:calc(var(--u)*7);height:calc(var(--u)*7);pointer-events:none;z-index:1;
+  background:
+    linear-gradient(#fff,#fff) center / 100% max(1px,var(--u)) no-repeat,
+    linear-gradient(#fff,#fff) center / max(1px,var(--u)) 100% no-repeat;
+  transform:translate(-50%,-50%)}
+.cross--tl{left:calc(var(--u)*65);top:calc(var(--u)*63.5)}
+.cross--tr{right:calc(var(--u)*64);top:calc(var(--u)*63.5);transform:translate(50%,-50%)}
+.cross--bl{left:calc(var(--u)*65);bottom:calc(var(--u)*65.5);transform:translate(-50%,50%)}
+.cross--br{right:calc(var(--u)*64);bottom:calc(var(--u)*65.5);transform:translate(50%,50%)}
+
+/* header */
+.header{position:absolute;inset:0 0 auto 0;height:calc(var(--u)*63);z-index:3}
+.logo{position:absolute;left:calc(var(--u)*87.3);top:calc(var(--u)*22.1);
+  font:500 max(calc(var(--u)*22), 15px)/1 var(--sans);letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
+.nav{position:absolute;left:50%;top:calc(var(--u)*25.8);transform:translateX(-50%);
+  display:flex;gap:calc(var(--u)*16.5);margin:0;padding:0;list-style:none;
+  font:500 max(calc(var(--u)*13.4), 11px)/1 var(--mono);color:var(--nav);white-space:nowrap}
+.nav a{display:block;transition:color .2s ease}
+.btn-call{position:absolute;right:calc(var(--u)*81.25);top:calc(var(--u)*15.8);
+  width:calc(var(--u)*161.65);height:calc(var(--u)*33.1);
+  display:flex;align-items:center;justify-content:center;
+  font:500 max(calc(var(--u)*13.3), 11px)/1 var(--mono);color:var(--cta-ink);white-space:nowrap;transition:background-color .2s ease}
+.menu-toggle{display:none}
+
+/* side label + footer meta */
+.side{position:absolute;left:calc(var(--u)*38.8);top:calc(var(--u)*83);z-index:2;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font:400 max(calc(var(--u)*11.36), 9.5px)/1 var(--mono);color:var(--ink-2);white-space:nowrap}
+.meta{position:absolute;right:calc(var(--u)*81.8);bottom:calc(var(--u)*25);z-index:2;margin:0;
+  font:400 max(calc(var(--u)*11.4), 9.5px)/1 var(--mono);color:var(--meta);white-space:nowrap}
+
+/* hero */
+.hero{position:absolute;left:0;right:0;top:calc(var(--ex) * .30);height:calc(var(--u)*512);z-index:2;text-align:center}
+.hero h1{position:absolute;left:0;right:0;top:calc(var(--u)*136);margin:0;
+  font:600 calc(var(--u)*64.4)/1.2 var(--sans);letter-spacing:-.03em;color:var(--ink)}
+.hero p{position:absolute;left:0;right:0;top:calc(var(--u)*314.5);margin:0;
+  font:400 max(calc(var(--u)*17.09), 12px)/max(calc(var(--u)*21.8), 15.3px) var(--mono);color:var(--sub)}
+.ctas{position:absolute;left:50%;top:calc(var(--u)*404.5);transform:translateX(calc(-50% + var(--u)*1.05));
+  display:flex;gap:calc(var(--u)*21)}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:calc(var(--u)*46);
+  padding:calc(var(--u)*2.8) calc(var(--u)*36) 0;font:500 max(calc(var(--u)*17.12), 12px)/1 var(--mono);white-space:nowrap;
+  transition:background-color .2s ease,color .2s ease}
+.btn--primary{background-color:var(--accent);color:var(--on-accent)}
+.btn--ghost{color:var(--cta-ink);padding-left:calc(var(--u)*37.05);padding-right:calc(var(--u)*37.05)}
+
+/* cards — glass tiles */
+.cards{position:absolute;z-index:2;left:50%;transform:translateX(-50%);
+  top:calc(var(--u)*511.9 + var(--ex) * .42);
+  height:calc(var(--u)*404.3 + var(--ex) * .45);
+  width:calc(var(--u)*(371.55*3 + 24.3*2));
+  display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*24.3);margin:0;padding:0;list-style:none}
+.card{position:relative;margin:0;overflow:hidden;border-radius:calc(var(--u)*16);background:#0f0f0f;
+  transform:translateZ(0)}
+.card img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.card::before{content:"";position:absolute;inset:0;background:var(--card-veil);pointer-events:none}
+/* glass rim: a 1px stroke whose light falls in from the bottom-left and catches again top-right */
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  padding:max(1px,var(--u));
+  background:linear-gradient(to top right,var(--rim-a) 0%,var(--rim-b) 25%,var(--rim-b) 75%,var(--rim-c) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.card figcaption{position:absolute;left:0;right:0;bottom:calc(var(--u)*39.8);z-index:1;
+  font:400 max(calc(var(--u)*16.1), 11px)/1 var(--sans);color:var(--cap);text-align:center;white-space:nowrap}
+
+/* ═════════════════════════ RESPONSIVE ARCHITECTURE ═════════════════════════
+   The artboard above stays in charge while it can still be read: one design px must be at least
+   0.58 screen px (≈ 835 × 595 viewport), and the screen must be no taller than 1 : 1.1 (beyond that
+   the card row is stretched under a 0.7 card proportion). Everything else re-composes the SAME DOM:
+
+   TABLET  — full header (logo · nav · Book A Call), centred two-line headline, the three tiles in one
+             row filling the height that remains, guide frame + vertical side label kept. Fluid unit
+             --tp shrinks the comp from 1 px down to 0.82 px per design px.
+   MOBILE  — starts only where logo + centred nav + Book A Call can no longer sit on one line
+             (measured: 620 px). Nav + CTA move into the menu, CTAs stack at equal width, tiles
+             become a 2-column mosaic so no image is crushed into a sliver.                       */
+@media not all and (min-aspect-ratio: 11/10) and (min-width: 835px) and (min-height: 595px){
+  :root{
+    --tp:clamp(.82px, min(calc(100vw / 1000), calc(var(--vh) * 100 / 900)), 1px);   /* one design px in tablet mode */
+    --g:clamp(12px, 4vw, 40px);                           /* guide inset  (desktop: 64)  */
+    --e:calc(var(--g) + clamp(12px, 3vw, 28px));          /* content inset (desktop: 87) */
+    --hh:calc(var(--tp) * 63);                            /* header band  (desktop: 63)  */
+    --fh:calc(var(--tp) * 65);                            /* footer band  (desktop: 65)  */
+    --cg:calc(var(--tp) * 24.3);                          /* tile gap                    */
+    --row:min(calc(100vw - 2 * var(--e)), calc(var(--tp) * 1164.3));
+    --cw:calc((var(--row) - 2 * var(--cg)) / 3);          /* one tile's width            */
+  }
+  body{background-size:256px}
+  .frame{height:auto;min-height:calc(var(--vh) * 100);overflow:visible;display:flex;flex-direction:column}
+
+  /* guide frame + registration crosses follow the new insets (all four kept) */
+  .guide,.cross{--u:1px}
+  .guide--l{left:var(--g)}  .guide--r{right:var(--g)}
+  .guide--t{top:var(--hh)}  .guide--b{bottom:var(--fh)}
+  .cross{width:7px;height:7px}
+  .cross--tl{left:calc(var(--g) + .5px);top:calc(var(--hh) + .5px)}
+  .cross--tr{right:calc(var(--g) + .5px);top:calc(var(--hh) + .5px)}
+  .cross--bl{left:calc(var(--g) + .5px);bottom:calc(var(--fh) + .5px)}
+  .cross--br{right:calc(var(--g) + .5px);bottom:calc(var(--fh) + .5px)}
+
+  /* header: the desktop header itself, scaled by --tp and pinned to the content inset */
+  .header{--u:var(--tp);position:relative;inset:auto;flex:none;height:var(--hh)}
+  .logo{left:var(--e)}
+  .btn-call{right:var(--e)}
+
+  /* hero */
+  .hero{--u:var(--tp);position:relative;inset:auto;height:auto;flex:none;
+    margin-top:auto;padding:calc(var(--tp) * 72.5) var(--e) 0}
+  .hero h1,.hero p,.ctas{position:static;transform:none}
+  .hero h1{   /* keeps the comp's two-line lock-up: line one is 11.54em wide */
+    font-size:min(calc(var(--tp) * 64.4), calc((100vw - 2 * var(--e)) / 11.7), calc(var(--vh) * 10))}
+  .hero p{margin:calc(var(--tp) * 24) auto 0;
+    font-size:min(calc(var(--tp) * 17.09), calc((100vw - 2 * var(--e)) / 40));line-height:1.276}
+  .ctas{display:flex;justify-content:center;margin-top:calc(var(--tp) * 46.5)}
+
+  /* tiles: one row, fills what is left, never flatter than the artwork nor thinner than 1:2 */
+  .cards{--u:var(--tp);position:relative;inset:auto;transform:none;flex:1 1 0;
+    width:var(--row);height:auto;margin:calc(var(--tp) * 61.4) auto calc(var(--tp) * 42);
+    min-height:calc(var(--cw) / .918);max-height:calc(var(--cw) / .5);grid-template-rows:minmax(0,1fr)}
+  .card figcaption{padding:0 10px;white-space:normal;line-height:1.2;text-wrap:balance}
+
+  /* footer band: meta bottom-right, side label stays vertical in the left gutter */
+  .foot{--u:var(--tp);flex:none;height:var(--fh);margin-top:auto;display:flex;align-items:flex-end;
+    justify-content:flex-end;padding:0 var(--e) calc(var(--tp) * 25)}
+  .meta{position:static}
+  .side{--u:var(--tp);left:calc(var(--g) / 2 - .5em);top:calc(var(--hh) + var(--tp) * 20)}
+}
+
+/* ─────────────── MOBILE ─────────────── */
+@media (max-width: 619.98px){
+  :root{
+    --tp:clamp(.92px, calc(100vw / 390), 1.12px);          /* one design px on phones (390 base) */
+    --g:clamp(10px, 3.2vw, 16px);
+    --e:calc(var(--g) + clamp(10px, 3.2vw, 16px));
+    --hh:calc(var(--tp) * 58);
+    --fh:calc(var(--tp) * 60);
+    --mg:calc(var(--tp) * 10);                            /* mosaic gap */
+  }
+
+  /* header → logo + menu control */
+  .logo{top:50%;transform:translateY(-50%)}
+  .menu-toggle{display:block;position:absolute;right:calc(var(--e) - 9px);top:50%;transform:translateY(-50%);
+    --u:1px;width:42px;height:42px;padding:0;border:0;color:#fff;background-color:transparent;cursor:pointer;
+    -webkit-tap-highlight-color:transparent}
+  .menu-toggle .bars,.menu-toggle .bars::before{position:absolute;left:13px;width:16px;height:1px;background:currentColor;
+    transition:transform .25s ease,top .25s ease}
+  .menu-toggle .bars{top:17px}
+  .menu-toggle .bars::before{content:"";left:0;top:7px}
+  .frame.menu-open .menu-toggle .bars{top:20.5px;transform:rotate(45deg)}
+  .frame.menu-open .menu-toggle .bars::before{top:0;transform:rotate(-90deg)}
+
+  /* menu: a sheet that drops out of the header band, inside the guide frame */
+  .menu{position:absolute;z-index:20;top:calc(var(--hh) + 1px);left:calc(var(--g) + 1px);right:calc(var(--g) + 1px);
+    height:calc(var(--vh) * 100 - var(--hh) - 1px);display:flex;flex-direction:column;align-items:flex-start;
+    padding:calc(var(--tp) * 6) calc(var(--e) - var(--g) - 1px) calc(var(--tp) * 28 + env(safe-area-inset-bottom));
+    background:var(--bg) var(--grain) 0 0 / 256px repeat;
+    opacity:0;visibility:hidden;transform:translateY(-8px);
+    transition:opacity .25s ease,transform .25s ease,visibility 0s linear .25s}
+  .frame.menu-open .menu{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .25s ease}
+  .menu .nav{position:static;transform:none;flex-direction:column;gap:0;align-self:stretch;
+    font-size:calc(var(--tp) * 18);color:var(--nav)}
+  .menu .nav a{padding:calc(var(--tp) * 18) 0;
+    background:repeating-linear-gradient(90deg,var(--guide) 0 2px,transparent 0 4px) left bottom / 100% 1px no-repeat}
+  .menu .btn-call{--u:1px;position:static;margin-top:calc(var(--tp) * 30);
+    width:calc(var(--tp) * 161.65);height:44px;font-size:calc(var(--tp) * 13.3)}
+
+  /* hero */
+  .hero{padding:calc(var(--tp) * 30) var(--e) 0}
+  .hero h1{font-size:min(calc((100vw - 2 * var(--e)) / 11.7), 40px);line-height:1.16}
+  .hero p{margin-top:calc(var(--tp) * 16);max-width:34em;font-size:max(12.5px, calc(var(--tp) * 13.2));line-height:1.6;text-wrap:pretty}
+  .hero p br{display:none}
+  .ctas{display:grid;width:fit-content;max-width:100%;margin:calc(var(--tp) * 26) auto 0;gap:calc(var(--tp) * 10)}
+  .btn{font-size:calc(var(--tp) * 14.5);padding-inline:calc(var(--tp) * 28)}
+
+  /* tiles: mosaic — tile 2 (the captioned one, centre stage on desktop) runs full height */
+  .cards{width:calc(100% - 2 * var(--e));margin:calc(var(--tp) * 28) auto calc(var(--tp) * 20);gap:var(--mg);
+    grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"a b" "c b";
+    min-height:calc(var(--tp) * 300);max-height:calc((100vw - 2 * var(--e) - var(--mg)) / 2 / .45)}
+  .card{border-radius:calc(var(--tp) * 14)}
+  .card:nth-child(1){grid-area:a} .card:nth-child(2){grid-area:b} .card:nth-child(3){grid-area:c}
+  .card figcaption{bottom:calc(var(--tp) * 18);padding:0 8px;font-size:calc(var(--tp) * 13)}
+
+  /* footer band: side label joins the meta line (the gutter is too narrow for vertical text) */
+  .foot{align-items:center;align-content:center;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;
+    padding:0 var(--e) env(safe-area-inset-bottom)}
+  .side{position:static;writing-mode:horizontal-tb;transform:none;font-size:calc(var(--tp) * 10)}
+  .meta{font-size:calc(var(--tp) * 10)}
+}
+html.menu-lock{overflow:hidden}
+@media (hover: hover){
+  .nav a:hover{color:#fff}
+  .btn-call:hover,.btn--ghost:hover{background-color:rgba(255,255,255,.06)}
+  .btn--primary:hover{background-color:var(--accent-hi)}
+  .card:hover img{transform:scale(1.03)}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+<div class="frame" id="frame">
+  <span class="guide guide--v guide--l" aria-hidden="true"></span>
+  <span class="guide guide--v guide--r" aria-hidden="true"></span>
+  <span class="guide guide--h guide--t" aria-hidden="true"></span>
+  <span class="guide guide--h guide--b" aria-hidden="true"></span>
+  <span class="cross cross--tl" aria-hidden="true"></span>
+  <span class="cross cross--tr" aria-hidden="true"></span>
+  <span class="cross cross--bl" aria-hidden="true"></span>
+  <span class="cross cross--br" aria-hidden="true"></span>
+
+  <header class="header">
+    <a class="logo" href="#" aria-label="Mindflux home">Mindflux</a>
+    <nav class="menu" id="menu" aria-label="Primary">
+      <ul class="nav">
+        <li><a href="#vision">Vision</a></li>
+        <li><a href="#systems">Systems</a></li>
+        <li><a href="#join">Join Us</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a class="btn-call dash-box" href="#contact">Book A Call</a>
+    </nav>
+    <button class="menu-toggle dash-box" type="button" aria-controls="menu" aria-expanded="false"><span class="bars" aria-hidden="true"></span><span class="sr-only">Menu</span></button>
+  </header>
+
+  <main class="hero" id="vision">
+    <h1>Designing The Next Layer<br> Of Mind–Tech Fusion</h1>
+    <p>We’re pioneering interfaces that blend cognition and computation —<br> designing seamless layers between minds and machines.</p>
+    <div class="ctas">
+      <a class="btn btn--primary" href="#vision">Explore Our Vision</a>
+      <a class="btn btn--ghost dash-box" href="#join">Join the Neural Shift</a>
+    </div>
+  </main>
+
+  <ul class="cards" id="systems" aria-label="Featured work">
+    <li class="card"><img src="assets/eye.webp" alt="Close-up of an eye crossed by streaks of orange and blue light" width="1058" height="1152" decoding="async"></li>
+    <li class="card"><figure style="margin:0;height:100%"><img src="assets/vr-headset.webp" alt="Figure wearing a VR headset dissolving into motion-blurred light" width="1058" height="1152" decoding="async"><figcaption>Where Thought Becomes Design</figcaption></figure></li>
+    <li class="card"><img src="assets/orb.webp" alt="A glowing orb of light levitating above an open hand" width="1058" height="1152" decoding="async"></li>
+  </ul>
+
+  <footer class="foot">
+    <div class="side">// Beta testing v2.0</div>
+    <p class="meta">// Orbital Studio · MRS | 12:24 IHT</p>
+  </footer>
+</div>
+<script>
+/* Mobile menu only — layout itself is pure CSS. */
+(function(){
+  var frame=document.getElementById('frame'),
+      btn=frame.querySelector('.menu-toggle'),
+      menu=document.getElementById('menu'),
+      label=btn.querySelector('.sr-only'),
+      mobile=window.matchMedia('(max-width: 619.98px)');
+  function items(){return [btn].concat([].slice.call(menu.querySelectorAll('a')));}
+  function setOpen(open,restoreFocus,viaKeyboard){
+    frame.classList.toggle('menu-open',open);
+    document.documentElement.classList.toggle('menu-lock',open);
+    btn.setAttribute('aria-expanded',String(open));
+    label.textContent=open?'Close menu':'Menu';
+    if(open){ if(window.scrollY>0) window.scrollTo(0,0); if(viaKeyboard){ var first=menu.querySelector('a'); if(first) first.focus({preventScroll:true}); } }
+    else if(restoreFocus){ btn.focus({preventScroll:true}); }
+  }
+  btn.addEventListener('click',function(e){setOpen(!frame.classList.contains('menu-open'),true,e.detail===0);});  /* detail 0 = keyboard activation */
+  menu.addEventListener('click',function(e){ if(e.target.closest('a') && mobile.matches) setOpen(false,false); });
+  document.addEventListener('keydown',function(e){
+    if(!frame.classList.contains('menu-open')) return;
+    if(e.key==='Escape'){ e.preventDefault(); setOpen(false,true); return; }
+    if(e.key==='Tab'){                                   /* keep focus inside header + sheet */
+      var list=items(),i=list.indexOf(document.activeElement);
+      if(e.shiftKey && i<=0){ e.preventDefault(); list[list.length-1].focus(); }
+      else if(!e.shiftKey && i===list.length-1){ e.preventDefault(); list[0].focus(); }
+    }
+  });
+  (mobile.addEventListener?mobile.addEventListener.bind(mobile,'change'):mobile.addListener.bind(mobile))(function(m){ if(!m.matches) setOpen(false,false); });
+})();
+</script>
+</body>
+</html>
